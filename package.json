@@ -2,7 +2,7 @@
   "name": "shooter",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.html",
   "homepage": "https://ukrwebprom.github.io/shooter/",
   "type": "module",
   "scripts": {
