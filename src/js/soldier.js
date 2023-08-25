@@ -52,10 +52,6 @@ class Soldier {
         this.walkID = null;
         this.draw(0);
     }
-
-    setPosition(x, y) {
-
-    }
 }
 
 export {Soldier};

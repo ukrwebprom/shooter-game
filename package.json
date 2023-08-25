@@ -8,13 +8,15 @@
   "scripts": {
     "start": "parcel src/*.html",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint:js": "eslint src/**/*.{js,jsx}"
+    "lint:js": "eslint src/**/*.{js,jsx}",
+    "build": "parcel build src/*.html --public-url /shooter"
   },
   "author": "Duca",
   "license": "ISC",
   "devDependencies": {
     "@parcel/transformer-sass": "^2.9.3",
     "buffer": "^6.0.3",
+    "eslint": "^8.47.0",
     "parcel": "^2.9.3",
     "sass": "^1.66.0"
   },

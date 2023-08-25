@@ -20,7 +20,7 @@ const removeEnemy = id => {
         enemies.splice(index, 1);
         const enemyElement = document.getElementById(id);
         enemyElement.remove();
-    };
+    }
 }
 
 const letsEnemyGo = (direction, id) => {
