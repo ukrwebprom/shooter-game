@@ -8,7 +8,7 @@
     "start": "parcel src/*.html",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint:js": "eslint src/**/*.{js,jsx}",
-    "build": "parcel build src/*.html --public-url /shooter"
+    "build": "parcel build src/*.html --public-url /shooter-game/"
   },
   "author": "Duca",
   "license": "ISC",
