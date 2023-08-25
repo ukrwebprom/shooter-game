@@ -2,7 +2,7 @@
   "name": "shooter",
   "version": "1.0.0",
   "description": "",
-  "homepage": "https://ukrwebprom.github.io/shooter/",
+  "homepage": "https://ukrwebprom.github.io/shooter-game/",
   "type": "module",
   "scripts": {
     "start": "parcel src/*.html",
