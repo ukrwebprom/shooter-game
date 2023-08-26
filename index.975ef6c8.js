@@ -584,6 +584,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "shiftGround", ()=>shiftGround);
 parcelHelpers.export(exports, "shift", ()=>shift);
 parcelHelpers.export(exports, "init", ()=>init);
+parcelHelpers.export(exports, "getCurrentRoom", ()=>getCurrentRoom);
 var _api = require("./api");
 var _tiles = require("./tiles");
 var _groundSpriteJpg = require("../images/ground-sprite.jpg");
@@ -595,6 +596,7 @@ var _enemiesManager = require("./enemies-manager");
 var _websocket = require("./websocket");
 const ground = document.querySelector("#ground");
 const loader = document.querySelector("#loading");
+let currentRoom = null;
 const canvas = document.querySelector("#ground-canvas");
 const canvasContext = canvas.getContext("2d");
 let shift = {
@@ -632,14 +634,17 @@ const init = async (n)=>{
     drawGround(tile);
     const parts = await (0, _tiles.getTiles)((0, _partsSpritePngDefault.default));
     const data = await (0, _api.getMap)(n);
-    console.log(data);
+    currentRoom = data.id;
     if (data.map) {
         drawMap(data.map, parts);
         loader.style.display = "none";
         (0, _playerManager.initPlayer)(data.start);
         (0, _enemiesManager.initEnemies)(data.enemies);
-        (0, _websocket.enterRoom)(data.id);
+        (0, _websocket.enterRoom)(currentRoom);
     }
+};
+const getCurrentRoom = ()=>{
+    return currentRoom;
 };
 
 },{"./api":"9u7qN","./tiles":"6d6xE","../images/ground-sprite.jpg":"jYlJq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../images/parts-sprite.png":"gw8Hy","./player-manager":"5rQR4","./enemies-manager":"bXSw1","./websocket":"hQPTI"}],"9u7qN":[function(require,module,exports) {
@@ -697,8 +702,8 @@ parcelHelpers.export(exports, "instance", ()=>instance);
 parcelHelpers.export(exports, "URL", ()=>URL);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
-/*baseURL: `https://shooter-ykfl.onrender.com`, */ const URL = "http://localhost:8080";
-const instance = (0, _axiosDefault.default).create({
+const URL = "https://shooter-ykfl.onrender.com";
+/* const URL = 'http://localhost:8080'; */ const instance = (0, _axiosDefault.default).create({
     baseURL: URL
 });
 
@@ -5129,6 +5134,7 @@ parcelHelpers.export(exports, "letsStop", ()=>letsStop);
 parcelHelpers.export(exports, "getPosition", ()=>getPosition);
 var _soldier = require("./soldier");
 var _groundManager = require("./ground-manager");
+var _websocket = require("./websocket");
 const position = {};
 const speed = 100;
 let lastInterval = null;
@@ -5141,8 +5147,8 @@ const area = {
 const container = document.querySelector("#player");
 const player = new (0, _soldier.Soldier)("my player");
 const initPlayer = ({ x, y })=>{
-    position.x = x * 100;
-    position.y = y * 100;
+    position.x = x;
+    position.y = y;
     container.style.left = position.x;
     container.style.top = position.y;
     player.spawn(container);
@@ -5202,6 +5208,7 @@ const letsGo = (direction)=>{
     if (moveIntervalID) clearInterval(moveIntervalID);
     const vector = rotate(direction);
     player.walk();
+    let sincCounter = 0;
     moveIntervalID = setInterval(()=>{
         const Delta = lastInterval ? Date.now() - lastInterval : 30;
         const offset = speed * Delta * 0.001;
@@ -5211,6 +5218,11 @@ const letsGo = (direction)=>{
         container.style.left = position.x;
         container.style.top = position.y;
         checkBorders();
+        sincCounter += 1;
+        if (sincCounter === 10) {
+            (0, _websocket.updatePosition)(position);
+            sincCounter = 0;
+        }
     }, 30);
 };
 const letsStop = ()=>{
@@ -5218,16 +5230,17 @@ const letsStop = ()=>{
     clearInterval(moveIntervalID);
     moveIntervalID = null;
     lastInterval = null;
+    (0, _websocket.updatePosition)(getPosition());
 };
 const getPosition = ()=>{
     const pos = {
-        x: position.x / 100,
-        y: position.y / 100
+        x: position.x,
+        y: position.y
     };
     return pos;
 };
 
-},{"./soldier":"iJcxl","./ground-manager":"fKrpI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iJcxl":[function(require,module,exports) {
+},{"./soldier":"iJcxl","./ground-manager":"fKrpI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./websocket":"hQPTI"}],"iJcxl":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Soldier", ()=>Soldier);
@@ -5275,170 +5288,49 @@ class Soldier {
         this.walkID = null;
         this.draw(0);
     }
-    setPosition(x, y) {}
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./tiles":"6d6xE","../images/soldier-sprite.png":"g8RFq"}],"g8RFq":[function(require,module,exports) {
 module.exports = require("d74aeaf61ff0c20d").getBundleURL("bLxZJ") + "soldier-sprite.429ad647.png" + "?" + Date.now();
 
-},{"d74aeaf61ff0c20d":"lgJ39"}],"bXSw1":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "initEnemies", ()=>initEnemies);
-parcelHelpers.export(exports, "createEnemy", ()=>createEnemy);
-parcelHelpers.export(exports, "removeEnemy", ()=>removeEnemy);
-parcelHelpers.export(exports, "letsEnemyGo", ()=>letsEnemyGo);
-parcelHelpers.export(exports, "letsEnemyStop", ()=>letsEnemyStop);
-var _enemy = require("./enemy");
-const enemies = [];
-const container = document.querySelector("#enemies");
-const initEnemies = (data)=>{
-    data.forEach((enemy)=>{
-        const { x, y } = enemy.position;
-        createEnemy(enemy.playerID, x, y);
-    });
-};
-const createEnemy = (id, x, y)=>{
-    const enemy = new (0, _enemy.Enemy)(id, x, y);
-    enemy.spawn(container);
-    enemies.push(enemy);
-};
-const removeEnemy = (id)=>{
-    const index = enemies.findIndex((e)=>e.id === id);
-    if (index !== -1) {
-        enemies.splice(index, 1);
-        const enemyElement = document.getElementById(id);
-        enemyElement.remove();
-    }
-};
-const letsEnemyGo = (direction, id)=>{
-    const enemy = enemies.find((e)=>e.id === id);
-    enemy.move(direction);
-};
-const letsEnemyStop = (id)=>{
-    const enemy = enemies.find((e)=>e.id === id);
-    enemy.stop();
-};
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./enemy":"d4MNF"}],"d4MNF":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Enemy", ()=>Enemy);
-var _soldier = require("./soldier");
-class Enemy {
-    #id;
-    #intervalID;
-    #moveIntervalID = null;
-    #lastInterval = null;
-    #speed = 100;
-    constructor(id, x, y){
-        this.#id = id;
-        this.container = document.createElement("div");
-        this.container.id = id;
-        this.#intervalID = null;
-        this.character = new (0, _soldier.Soldier)(id);
-        this.position_x = x * 100;
-        this.position_y = y * 100;
-        this.container.style.position = "absolute";
-        this.container.style.left = this.position_x;
-        this.container.style.top = this.position_y;
-        this.character.spawn(this.container);
-    }
-    spawn(container) {
-        container.appendChild(this.container);
-    }
-    #rotate(direction) {
-        const motion = {
-            x: 0,
-            y: 0
-        };
-        switch(direction){
-            case "ArrowUp":
-                this.container.style.transform = "rotate(0turn)";
-                motion.y = -1;
-                break;
-            case "ArrowDown":
-                if (this.container.style.transform === "rotate(-0.25turn)") this.container.style.transform = "rotate(-0.5turn)";
-                else this.container.style.transform = "rotate(0.5turn)";
-                motion.y = 1;
-                break;
-            case "ArrowRight":
-                this.container.style.transform = "rotate(0.25turn)";
-                motion.x = 1;
-                break;
-            case "ArrowLeft":
-                if (this.container.style.transform === "rotate(0.5turn)") this.container.style.transform = "rotate(0.75turn)";
-                else this.container.style.transform = "rotate(-0.25turn)";
-                motion.x = -1;
-                break;
-        }
-        return motion;
-    }
-    move(direction) {
-        if (this.#moveIntervalID) clearInterval(this.#moveIntervalID);
-        const vector = this.#rotate(direction);
-        this.character.walk();
-        this.#moveIntervalID = setInterval(()=>{
-            const Delta = this.#lastInterval ? Date.now() - this.#lastInterval : 30;
-            const offset = this.#speed * Delta * 0.001;
-            this.#lastInterval = Date.now();
-            this.position_x += vector.x * offset;
-            this.position_y += vector.y * offset;
-            this.container.style.left = this.position_x;
-            this.container.style.top = this.position_y;
-        }, 30);
-    }
-    stop() {
-        this.character.stopWalking();
-        clearInterval(this.#moveIntervalID);
-        this.#moveIntervalID = null;
-        this.#lastInterval = null;
-    }
-    get id() {
-        return this.#id;
-    }
-    get intervalID() {
-        return this.#intervalID;
-    }
-    set intervalID(n) {
-        this.#intervalID = n;
-    }
-}
-
-},{"./soldier":"iJcxl","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hQPTI":[function(require,module,exports) {
+},{"d74aeaf61ff0c20d":"lgJ39"}],"hQPTI":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "enterRoom", ()=>enterRoom);
 parcelHelpers.export(exports, "sendMove", ()=>sendMove);
 parcelHelpers.export(exports, "sendStop", ()=>sendStop);
+parcelHelpers.export(exports, "updatePosition", ()=>updatePosition);
 var _socketIoClient = require("socket.io-client");
 var _socketIoClientDefault = parcelHelpers.interopDefault(_socketIoClient);
 var _api = require("./api");
 var _instance = require("./instance");
 var _enemiesManager = require("./enemies-manager");
 var _playerManager = require("./player-manager");
+var _groundManager = require("./ground-manager");
 const socket = (0, _socketIoClientDefault.default).connect((0, _instance.URL));
-let updateIntervalId = null;
+const getUpdate = ()=>{
+    const roomId = (0, _groundManager.getCurrentRoom)();
+    socket.emit("getEnemyPositions", {
+        roomId
+    });
+};
 const enterRoom = (roomId)=>{
     socket.emit("enter", {
         roomId,
         playerId: (0, _api.playerId)
     });
 };
+const updatePosition = (position)=>{
+    socket.emit("updatePosition", {
+        playerId: (0, _api.playerId),
+        position
+    });
+};
 const sendMove = (direction)=>{
     socket.emit("move", direction);
-    if (!updateIntervalId) updateIntervalId = setInterval(()=>{
-        const position = (0, _playerManager.getPosition)();
-        socket.emit("updatePosition", {
-            playerId: (0, _api.playerId),
-            position
-        });
-    }, 1000);
 };
 const sendStop = ()=>{
     console.log("stop");
-    clearInterval(updateIntervalId);
-    updateIntervalId = null;
     const position = (0, _playerManager.getPosition)();
     socket.emit("updatePosition", {
         playerId: (0, _api.playerId),
@@ -5457,14 +5349,16 @@ socket.on("removeEnemy", (data)=>{
 socket.on("move", (data)=>{
     const { direction, playerId } = data;
     (0, _enemiesManager.letsEnemyGo)(direction, playerId);
-    console.log(data);
 });
 socket.on("stop", (data)=>{
     (0, _enemiesManager.letsEnemyStop)(data);
-    console.log(data);
 });
+socket.on("update", (data)=>{
+    (0, _enemiesManager.updateEnemyPosition)(data);
+});
+window.addEventListener("focus", getUpdate);
 
-},{"socket.io-client":"8HBJR","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./api":"9u7qN","./instance":"lScqs","./enemies-manager":"bXSw1","./player-manager":"5rQR4"}],"8HBJR":[function(require,module,exports) {
+},{"socket.io-client":"8HBJR","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./api":"9u7qN","./instance":"lScqs","./enemies-manager":"bXSw1","./player-manager":"5rQR4","./ground-manager":"fKrpI"}],"8HBJR":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 /**
@@ -8879,6 +8773,157 @@ function Backoff(opts) {
  * @api public
  */ Backoff.prototype.setJitter = function(jitter) {
     this.jitter = jitter;
+};
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bXSw1":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "initEnemies", ()=>initEnemies);
+parcelHelpers.export(exports, "createEnemy", ()=>createEnemy);
+parcelHelpers.export(exports, "removeEnemy", ()=>removeEnemy);
+parcelHelpers.export(exports, "letsEnemyGo", ()=>letsEnemyGo);
+parcelHelpers.export(exports, "letsEnemyStop", ()=>letsEnemyStop);
+parcelHelpers.export(exports, "updateEnemyPosition", ()=>updateEnemyPosition);
+var _enemy = require("./enemy");
+var _display = require("./display");
+const enemies = [];
+const container = document.querySelector("#enemies");
+const initEnemies = (data)=>{
+    data.forEach((enemy)=>{
+        const { x, y } = enemy.position;
+        createEnemy(enemy.playerID, x, y);
+    });
+};
+const createEnemy = (id, x, y)=>{
+    const enemy = new (0, _enemy.Enemy)(id, x, y);
+    enemy.spawn(container);
+    enemies.push(enemy);
+    (0, _display.setEnemyCount)(enemies.length);
+};
+const removeEnemy = (id)=>{
+    const index = enemies.findIndex((e)=>e.id === id);
+    if (index !== -1) {
+        enemies.splice(index, 1);
+        const enemyElement = document.getElementById(id);
+        enemyElement.remove();
+        (0, _display.setEnemyCount)(enemies.length);
+    }
+};
+const letsEnemyGo = (direction, id)=>{
+    const enemy = enemies.find((e)=>e.id === id);
+    enemy.move(direction);
+};
+const letsEnemyStop = (id)=>{
+    const enemy = enemies.find((e)=>e.id === id);
+    enemy.stop();
+};
+const updateEnemyPosition = (data)=>{
+    data.forEach((d)=>{
+        console.log(d);
+        const enemy = enemies.find((e)=>e.id === d.playerID);
+        const { x, y } = d.position;
+        if (enemy) enemy.setPosition(x, y);
+    });
+};
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./enemy":"d4MNF","./display":"dgtD8"}],"d4MNF":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Enemy", ()=>Enemy);
+var _soldier = require("./soldier");
+class Enemy {
+    #id;
+    #intervalID;
+    #moveIntervalID = null;
+    #lastInterval = null;
+    #speed = 100;
+    constructor(id, x, y){
+        this.#id = id;
+        this.container = document.createElement("div");
+        this.container.id = id;
+        this.#intervalID = null;
+        this.character = new (0, _soldier.Soldier)(id);
+        this.position_x = x;
+        this.position_y = y;
+        this.container.style.position = "absolute";
+        this.container.style.left = this.position_x;
+        this.container.style.top = this.position_y;
+        this.character.spawn(this.container);
+    }
+    spawn(container) {
+        container.appendChild(this.container);
+    }
+    #rotate(direction) {
+        const motion = {
+            x: 0,
+            y: 0
+        };
+        switch(direction){
+            case "ArrowUp":
+                this.container.style.transform = "rotate(0turn)";
+                motion.y = -1;
+                break;
+            case "ArrowDown":
+                if (this.container.style.transform === "rotate(-0.25turn)") this.container.style.transform = "rotate(-0.5turn)";
+                else this.container.style.transform = "rotate(0.5turn)";
+                motion.y = 1;
+                break;
+            case "ArrowRight":
+                this.container.style.transform = "rotate(0.25turn)";
+                motion.x = 1;
+                break;
+            case "ArrowLeft":
+                if (this.container.style.transform === "rotate(0.5turn)") this.container.style.transform = "rotate(0.75turn)";
+                else this.container.style.transform = "rotate(-0.25turn)";
+                motion.x = -1;
+                break;
+        }
+        return motion;
+    }
+    setPosition(x, y) {
+        this.position_x = x;
+        this.position_y = y;
+        this.container.style.left = this.position_x;
+        this.container.style.top = this.position_y;
+    }
+    move(direction) {
+        if (this.#moveIntervalID) clearInterval(this.#moveIntervalID);
+        const vector = this.#rotate(direction);
+        this.character.walk();
+        this.#moveIntervalID = setInterval(()=>{
+            const Delta = this.#lastInterval ? Date.now() - this.#lastInterval : 30;
+            const offset = this.#speed * Delta * 0.001;
+            this.#lastInterval = Date.now();
+            this.position_x += vector.x * offset;
+            this.position_y += vector.y * offset;
+            this.container.style.left = this.position_x;
+            this.container.style.top = this.position_y;
+        }, 30);
+    }
+    stop() {
+        this.character.stopWalking();
+        clearInterval(this.#moveIntervalID);
+        this.#moveIntervalID = null;
+        this.#lastInterval = null;
+    }
+    get id() {
+        return this.#id;
+    }
+    get intervalID() {
+        return this.#intervalID;
+    }
+    set intervalID(n) {
+        this.#intervalID = n;
+    }
+}
+
+},{"./soldier":"iJcxl","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dgtD8":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "setEnemyCount", ()=>setEnemyCount);
+const enemyCount = document.getElementById("enemycount");
+const setEnemyCount = (n)=>{
+    enemyCount.innerText = n;
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ijC4F":[function(require,module,exports) {

@@ -79,7 +79,7 @@ body, div, p {
   display: flex;
 }
 
-#sidebar .indicators #ammo, #sidebar .indicators #health {
+#sidebar .indicators #ammo, #sidebar .indicators #health, #sidebar .indicators #enemycount {
   font-size: 35px;
 }
 
