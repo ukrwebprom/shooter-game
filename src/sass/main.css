@@ -76,6 +76,6 @@ body, div, p {
   gap: 15px;
   font-size: 22px;
 }
-#sidebar .indicators #ammo, #sidebar .indicators #health {
+#sidebar .indicators #ammo, #sidebar .indicators #health, #sidebar .indicators #enemycount {
   font-size: 35px;
 }/*# sourceMappingURL=main.css.map */

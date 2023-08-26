@@ -8,6 +8,7 @@ import { enterRoom } from "./websocket";
 
 const ground = document.querySelector('#ground');
 const loader = document.querySelector('#loading');
+let currentRoom = null;
 const canvas = document.querySelector('#ground-canvas');
 const canvasContext = canvas.getContext('2d');
 let shift = {x:0, y:0};
@@ -44,18 +45,21 @@ const init = async(n) => {
     drawGround(tile);
     const parts = await getTiles(partsTiles);
     const data = await getMap(n);
-    console.log(data);
+    currentRoom = data.id;
     if(data.map) {
         drawMap(data.map, parts);
         loader.style.display = 'none';
         initPlayer(data.start);
         initEnemies(data.enemies);
-        enterRoom(data.id);
+        enterRoom(currentRoom);
     }
 }
-
+const getCurrentRoom = () => {
+    return currentRoom;
+}
 export {
     shiftGround,
     shift,
     init,
+    getCurrentRoom
   };

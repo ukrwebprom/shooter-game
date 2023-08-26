@@ -1,5 +1,6 @@
 import {Soldier} from './soldier';
 import { shiftGround, shift } from './ground-manager';
+import { updatePosition } from './websocket';
 const position = {}
 const speed = 100;
 let lastInterval = null;
@@ -17,8 +18,8 @@ const container = document.querySelector('#player');
 const player = new Soldier('my player');
 
 const initPlayer = ({x, y}) => {
-    position.x = x*100;
-    position.y = y*100;
+    position.x = x;
+    position.y = y;
     container.style.left = position.x;
     container.style.top = position.y;
     player.spawn(container);
@@ -84,6 +85,7 @@ const letsGo = direction => {
     if(moveIntervalID) clearInterval(moveIntervalID);
     const vector = rotate(direction);
     player.walk();
+    let sincCounter = 0;
     moveIntervalID = setInterval(() => {
         const Delta = lastInterval? Date.now() - lastInterval : 30;
         const offset = speed * Delta * 0.001;
@@ -93,6 +95,11 @@ const letsGo = direction => {
         container.style.left = position.x;
         container.style.top = position.y;
         checkBorders();
+        sincCounter += 1;
+        if(sincCounter === 10) {
+            updatePosition(position);
+            sincCounter = 0;
+        }
     }, 30);
 }
 
@@ -101,12 +108,13 @@ const letsStop = () => {
     clearInterval(moveIntervalID);
     moveIntervalID = null;
     lastInterval = null;
+    updatePosition(getPosition());
 }
 
 const getPosition = () => {
     const pos = {
-        x:position.x / 100,
-        y:position.y / 100
+        x:position.x,
+        y:position.y
     }
     return pos;
 }

@@ -13,8 +13,8 @@ class Enemy {
         this.container.id = id;
         this.#intervalID = null;
         this.character = new Soldier(id);
-        this.position_x = x*100;
-        this.position_y = y*100;
+        this.position_x = x;
+        this.position_y = y;
         this.container.style.position = 'absolute';
         this.container.style.left = this.position_x;
         this.container.style.top = this.position_y;
@@ -52,7 +52,12 @@ class Enemy {
         }
         return motion;
     }
-
+    setPosition(x, y) {
+        this.position_x = x;
+        this.position_y = y; 
+        this.container.style.left = this.position_x;
+        this.container.style.top = this.position_y;
+    }
     move(direction) {
         if(this.#moveIntervalID) clearInterval(this.#moveIntervalID);
         const vector = this.#rotate(direction);

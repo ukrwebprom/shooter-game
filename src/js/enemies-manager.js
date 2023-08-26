@@ -1,4 +1,5 @@
 import { Enemy } from "./enemy"
+import { setEnemyCount } from "./display";
 const enemies = [];
 const container = document.querySelector('#enemies');
 const initEnemies = (data) => {
@@ -12,6 +13,7 @@ const createEnemy = (id, x, y) => {
     const enemy = new Enemy(id, x, y);
     enemy.spawn(container);
     enemies.push(enemy);
+    setEnemyCount(enemies.length);
 }
 
 const removeEnemy = id => {
@@ -20,6 +22,7 @@ const removeEnemy = id => {
         enemies.splice(index, 1);
         const enemyElement = document.getElementById(id);
         enemyElement.remove();
+        setEnemyCount(enemies.length);
     }
 }
 
@@ -33,10 +36,20 @@ const letsEnemyStop = (id) => {
     enemy.stop();
 }
 
+const updateEnemyPosition = data => {
+    data.forEach(d => {
+        console.log(d);
+        const enemy = enemies.find(e => e.id === d.playerID);
+        const {x,y} = d.position;
+        if(enemy) enemy.setPosition(x,y);
+    })
+}
+
 export {
     initEnemies,
     createEnemy,
     removeEnemy,
     letsEnemyGo,
-    letsEnemyStop
+    letsEnemyStop,
+    updateEnemyPosition
 }
