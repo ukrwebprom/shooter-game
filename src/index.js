@@ -1,4 +1,5 @@
-import {init} from './js/ground-manager';
 import './js/keyboard-manager';
+import './js/enter';
+import './js/pointer';
 
-init(1);
+

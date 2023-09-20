@@ -2,41 +2,41 @@ import io from 'socket.io-client';
 import { playerId } from './api';
 import { URL } from './instance';
 import { createEnemy, removeEnemy, letsEnemyGo, letsEnemyStop, updateEnemyPosition } from './enemies-manager';
-import { getPosition } from './player-manager';
-import { getCurrentRoom } from './ground-manager';
 
 
 const socket = io.connect(URL);
+let currentRoom = null;
 
 const getUpdate = () => {
-    const roomId = getCurrentRoom();
-    socket.emit('getEnemyPositions', {roomId});
+    socket.emit('getEnemyPositions', {roomId:currentRoom});
 }
 
-const enterRoom = roomId => {
-    socket.emit('enter', {roomId, playerId});
+const enterRoom = (roomId, startPos) => {
+    currentRoom = roomId;
+    socket.emit('enter', {roomId, startPos, playerId});
 };
 const updatePosition = position => {
     socket.emit('updatePosition', {playerId, position});
 }
 
-const sendMove = direction => {
-    socket.emit('move', direction);
+const sendMove = (direction, playerId) => {
+    socket.emit('move', {direction, playerId});
 }
 
-const sendStop = () => {
+const sendStop = (playerId) => {
     console.log('stop');
-    const position = getPosition();
-    socket.emit('updatePosition', {playerId, position});
-    socket.emit('stop');
+    //const position = getPosition();
+    //socket.emit('updatePosition', {playerId, position});
+    socket.emit('stop', playerId);
 }
 socket.on('newEnemy', data => {
     console.log('new enemy:', data);
     const {x, y} = data.position;
-    createEnemy(data.playerID, x, y);
+    createEnemy(data.playerId, x, y);
 })
 
 socket.on('removeEnemy', data => {
+    console.log('enemy leaved:', data);
     removeEnemy(data);
 })
 

@@ -1,14 +1,22 @@
 import { getTiles } from "./tiles";
+import { Pixels, getCellSize } from "./units";
 import sprite from '../images/soldier-sprite.png';
 
 class Soldier {
     constructor(name) {
         this.name = name;
+        this.rotation = 0;
         this.canvas = document.createElement('canvas');
         this.context = this.canvas.getContext('2d');
-        this.canvas.width = 100;
-        this.canvas.height = 100;
-        this.size = 100;
+        this.size = getCellSize();
+        this.canvas.width = this.size;
+        this.canvas.height = this.size;
+        this.canvas.style.transformOrigin = 'center center';
+        this.canvas.style.transition = 'transform 0.5s ease-in-out';
+        this.hint = document.createElement('p');
+        this.hint.innerText = name;
+        this.hint.classList.add('hint');
+        
         this.ready = false;
         this.walkID = null;
         this.init();
@@ -20,7 +28,7 @@ class Soldier {
         this.draw(0);
     }
     draw(step) {
-        this.context.clearRect(0, 0, this.size+50, this.size+50);
+        this.context.clearRect(0, 0, this.size*1.5, this.size*1.5);
         this.context.shadowColor = 'rgba(0, 0, 0, 0.3)';
         this.context.shadowOffsetX = 5;
         this.context.shadowOffsetY = 3;
@@ -34,6 +42,7 @@ class Soldier {
 
     spawn(container) {
         container.appendChild(this.canvas);
+/*         container.appendChild(this.hint); */
     }
 
     walk() {
@@ -51,6 +60,24 @@ class Soldier {
         clearInterval(this.walkID);
         this.walkID = null;
         this.draw(0);
+    }
+
+    rotate(to) {
+        switch(to) {
+            case 'ArrowUp':
+                this.rotation = 0;
+                break;
+            case 'ArrowDown':
+                this.rotation = 0.5;
+                break;
+            case 'ArrowRight':
+                this.rotation = 0.25;
+                break;
+            case 'ArrowLeft':
+                this.rotation = -0.25;
+                break;
+        }
+        this.canvas.style.transform = `rotate(${this.rotation}turn)`;
     }
 }
 
