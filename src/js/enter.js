@@ -1,7 +1,6 @@
 import {initGround} from './ground-manager';
 import { initWalls } from './walls-manager';
 import { enterRoom } from './websocket';
-import { getTiles } from './tiles';
 import { playerId, getMap, getRoom } from './api';
 import { initPlayer } from './player-manager';
 import { initScreen } from './screen-manager';
@@ -9,7 +8,7 @@ import { initEnemies } from './enemies-manager';
 import { CellsToMeter } from './units';
 
 let currentRoom = null;
-let maps = []
+
 const loader = document.querySelector('#loading');
 
 const startGame = async() => {

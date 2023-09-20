@@ -8543,7 +8543,6 @@ parcelHelpers.export(exports, "letsEnemyStop", ()=>letsEnemyStop);
 parcelHelpers.export(exports, "updateEnemyPosition", ()=>updateEnemyPosition);
 var _character = require("./character");
 var _display = require("./display");
-var _units = require("./units");
 const enemies = [];
 const container = document.querySelector("#players");
 const initEnemies = (data)=>{
@@ -8589,7 +8588,7 @@ const updateEnemyPosition = (data)=>{
     });
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./display":"dgtD8","./character":"gP4Cg","./units":"6NxyU"}],"dgtD8":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./display":"dgtD8","./character":"gP4Cg"}],"dgtD8":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "setEnemyCount", ()=>setEnemyCount);
@@ -8795,13 +8794,13 @@ parcelHelpers.export(exports, "CellsToPix", ()=>CellsToPix);
 parcelHelpers.export(exports, "getCellSize", ()=>getCellSize);
 parcelHelpers.export(exports, "cellSize", ()=>cellSize);
 const meter = 50; // pixels per metere
-const scale = 1;
+const SCALE = 1;
 const cellSize = 100; // size of cell in pixels
 const getCellSize = ()=>{
-    return cellSize * scale;
+    return cellSize * SCALE;
 };
 const Pixels = (n)=>{
-    return n * meter * scale;
+    return n * meter * SCALE;
 };
 const CellsToMeter = (n)=>{
     return n * 2;
@@ -8811,9 +8810,6 @@ const CellsToPix = (n)=>{
 };
 const MetersToCells = (n)=>{
     return Math.floor(n / cellSize);
-};
-const setScale = (n)=>{
-    scale = n;
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"g8RFq":[function(require,module,exports) {
@@ -8884,7 +8880,7 @@ const initScreen = (player)=>{
         x: (0, _units.Pixels)(player.position.x),
         y: (0, _units.Pixels)(player.position.y)
     });
-    const watchId = setInterval(()=>{
+    setInterval(()=>{
         checkBorders({
             x: (0, _units.Pixels)(player.position.x),
             y: (0, _units.Pixels)(player.position.y)
@@ -8916,19 +8912,19 @@ const checkBorders = (pos)=>{
 };
 const checkPosition = (id, pos)=>{
     (0, _pointer.setPointer)(0, (0, _units.Pixels)(pos.x), (0, _units.Pixels)(pos.y));
-    hit1 = (0, _wallsManager.collide)({
+    const hit1 = (0, _wallsManager.collide)({
         x: (0, _units.Pixels)(pos.x),
         y: (0, _units.Pixels)(pos.y)
     }, id);
-    hit2 = (0, _wallsManager.collide)({
+    const hit2 = (0, _wallsManager.collide)({
         x: (0, _units.Pixels)(pos.x) + (0, _units.getCellSize)(),
         y: (0, _units.Pixels)(pos.y)
     }, id);
-    hit3 = (0, _wallsManager.collide)({
+    const hit3 = (0, _wallsManager.collide)({
         x: (0, _units.Pixels)(pos.x),
         y: (0, _units.Pixels)(pos.y) + (0, _units.getCellSize)()
     }, id);
-    hit4 = (0, _wallsManager.collide)({
+    const hit4 = (0, _wallsManager.collide)({
         x: (0, _units.Pixels)(pos.x) + (0, _units.getCellSize)(),
         y: (0, _units.Pixels)(pos.y) + (0, _units.getCellSize)()
     }, id);
@@ -9045,14 +9041,12 @@ module.exports = require("5969e681f69a5a45").getBundleURL("bLxZJ") + "wall-sprit
 var _groundManager = require("./ground-manager");
 var _wallsManager = require("./walls-manager");
 var _websocket = require("./websocket");
-var _tiles = require("./tiles");
 var _api = require("./api");
 var _playerManager = require("./player-manager");
 var _screenManager = require("./screen-manager");
 var _enemiesManager = require("./enemies-manager");
 var _units = require("./units");
 let currentRoom = null;
-let maps = [];
 const loader = document.querySelector("#loading");
 const startGame = async ()=>{
     currentRoom = await (0, _api.getRoom)(currentRoom);
@@ -9076,7 +9070,7 @@ const startGame = async ()=>{
 };
 startGame();
 
-},{"./ground-manager":"fKrpI","./walls-manager":"cqi7s","./websocket":"hQPTI","./tiles":"6d6xE","./api":"9u7qN","./player-manager":"5rQR4","./screen-manager":"1CqGQ","./enemies-manager":"bXSw1","./units":"6NxyU"}],"fKrpI":[function(require,module,exports) {
+},{"./ground-manager":"fKrpI","./walls-manager":"cqi7s","./websocket":"hQPTI","./api":"9u7qN","./player-manager":"5rQR4","./screen-manager":"1CqGQ","./enemies-manager":"bXSw1","./units":"6NxyU"}],"fKrpI":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "initGround", ()=>initGround);

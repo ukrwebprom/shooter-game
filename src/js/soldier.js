@@ -1,5 +1,5 @@
 import { getTiles } from "./tiles";
-import { Pixels, getCellSize } from "./units";
+import { getCellSize } from "./units";
 import sprite from '../images/soldier-sprite.png';
 
 class Soldier {

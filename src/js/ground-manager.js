@@ -1,5 +1,5 @@
 import { getTiles } from "./tiles";
-import { Pixels, getCellSize, CellsToMeter, CellsToPix } from "./units";
+import { getCellSize } from "./units";
 import groundTiles from '../images/ground-sprite.jpg';
 
 

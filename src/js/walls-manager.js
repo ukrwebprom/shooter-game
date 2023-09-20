@@ -1,5 +1,5 @@
 import { Wall } from "./objects/wall";
-import { Pixels, CellsToMeter, MetersToCells, getCellSize } from "./units";
+import { MetersToCells, getCellSize } from "./units";
 const canvas = document.querySelector('#walls-canvas');
 canvas.width = getCellSize()*50;
 canvas.height = getCellSize()*50;

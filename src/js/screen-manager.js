@@ -19,7 +19,7 @@ const area = {
 }
 const initScreen = player => {
     moveToCenter({x:Pixels(player.position.x), y:Pixels(player.position.y)})
-    const watchId = setInterval(() => {
+    setInterval(() => {
         checkBorders({x:Pixels(player.position.x), y:Pixels(player.position.y)})
     }, 1000);
 }
@@ -50,10 +50,10 @@ const checkBorders = (pos) => {
 }
 const checkPosition = (id, pos) => {
     setPointer(0, Pixels(pos.x), Pixels(pos.y));
-    hit1 = collide({x:Pixels(pos.x), y:Pixels(pos.y)}, id);
-    hit2 = collide({x:Pixels(pos.x) + getCellSize(), y:Pixels(pos.y)}, id);
-    hit3 = collide({x:Pixels(pos.x), y:Pixels(pos.y) + getCellSize()}, id);
-    hit4 = collide({x:Pixels(pos.x) + getCellSize(), y:Pixels(pos.y) + getCellSize()}, id);
+    const hit1 = collide({x:Pixels(pos.x), y:Pixels(pos.y)}, id);
+    const hit2 = collide({x:Pixels(pos.x) + getCellSize(), y:Pixels(pos.y)}, id);
+    const hit3 = collide({x:Pixels(pos.x), y:Pixels(pos.y) + getCellSize()}, id);
+    const hit4 = collide({x:Pixels(pos.x) + getCellSize(), y:Pixels(pos.y) + getCellSize()}, id);
     return !hit1 && !hit2 && !hit3 && !hit4;
 }
 

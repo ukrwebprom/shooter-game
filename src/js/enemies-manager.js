@@ -1,6 +1,6 @@
 import { Character } from "./character"
 import { setEnemyCount } from "./display";
-import {CellsToMeter} from './units';
+
 const enemies = [];
 const container = document.querySelector('#players');
 

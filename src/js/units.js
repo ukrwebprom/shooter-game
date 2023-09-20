@@ -1,12 +1,12 @@
 const meter = 50; // pixels per metere
-const scale = 1; 
+const SCALE = 1; 
 const cellSize = 100; // size of cell in pixels
 
 const getCellSize = () => {
-    return cellSize * scale;
+    return cellSize * SCALE;
 }
 const Pixels = n => {
-    return n*meter*scale;
+    return n*meter*SCALE;
 }
 const CellsToMeter = n => {
     return n*2;
@@ -16,9 +16,6 @@ const CellsToPix = n => {
 }
 const MetersToCells = n => {
     return Math.floor(n / cellSize);
-}
-const setScale = n => {
-    scale = n;
 }
 
 export {
