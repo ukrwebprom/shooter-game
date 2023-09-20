@@ -29,6 +29,12 @@ body, div, p {
   left: 0;
 }
 
+#ground-canvas, #walls-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 #loading {
   color: #fff;
   z-index: 10;
@@ -42,11 +48,21 @@ body, div, p {
   transform: translate(-50%, -50%);
 }
 
-#player, #enemies {
+#players {
   transition: transform .5s ease-in-out;
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.hint {
+  background-color: #f0f8ff;
+  border-radius: 10px;
+  padding: 5px;
+  font-size: 8px;
+  position: absolute;
+  top: 0;
+  right: -30px;
 }
 
 #sidebar {
