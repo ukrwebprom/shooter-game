@@ -24,6 +24,7 @@ class Wall {
     }
 
     collide(originator) {
+        console.log(originator);
         return this.type !== 1;
     }
 }

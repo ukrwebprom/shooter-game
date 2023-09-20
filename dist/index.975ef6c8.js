@@ -5763,8 +5763,8 @@ parcelHelpers.export(exports, "instance", ()=>instance);
 parcelHelpers.export(exports, "URL", ()=>URL);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
-/*const URL = 'https://shooter-ykfl.onrender.com';*/ const URL = "http://localhost:8080";
-const instance = (0, _axiosDefault.default).create({
+const URL = "https://shooter-ykfl.onrender.com";
+/* const URL = 'http://localhost:8080'; */ const instance = (0, _axiosDefault.default).create({
     baseURL: URL
 });
 
@@ -9030,6 +9030,7 @@ class Wall {
         this.ctx.drawImage(this.img, type * 200, 0, 200, 200, this.x * (0, _units.getCellSize)(), this.y * (0, _units.getCellSize)(), (0, _units.getCellSize)(), (0, _units.getCellSize)());
     }
     collide(originator) {
+        console.log(originator);
         return this.type !== 1;
     }
 }
