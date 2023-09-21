@@ -5736,7 +5736,7 @@ const getRoom = async (n)=>{
         const response = await (0, _instance.instance)(`/rooms/${req}`);
         return response.data;
     } catch (err) {
-        return err;
+        throw new Error(err);
     }
 };
 const getMap = async (roomID)=>{
@@ -5744,7 +5744,7 @@ const getMap = async (roomID)=>{
         const response = await (0, _instance.instance)(`/map/?id=${roomID}`);
         return response.data;
     } catch (err) {
-        return err;
+        throw new Error(err);
     }
 };
 const getMapsList = async ()=>{
@@ -9050,24 +9050,28 @@ var _units = require("./units");
 let currentRoom = null;
 const loader = document.querySelector("#loading");
 const startGame = async ()=>{
-    currentRoom = await (0, _api.getRoom)(currentRoom);
-    const map = await (0, _api.getMap)(currentRoom.mapId);
-    console.log(currentRoom);
-    console.log(map);
-    //console.log(map.name.toUpperCase().replace(/ /g, '_'));
-    (0, _groundManager.initGround)(map.ground);
-    (0, _wallsManager.initWalls)(map.walls);
-    const player = (0, _playerManager.initPlayer)((0, _api.playerId), {
-        ...map.start
-    });
-    (0, _screenManager.initScreen)(player);
-    (0, _enemiesManager.initEnemies)(currentRoom.players);
-    const { x, y } = map.start;
-    (0, _websocket.enterRoom)(currentRoom.roomId, {
-        x: (0, _units.CellsToMeter)(x),
-        y: (0, _units.CellsToMeter)(y)
-    });
-    loader.style.display = "none";
+    try {
+        currentRoom = await (0, _api.getRoom)(currentRoom);
+        const map = await (0, _api.getMap)(currentRoom.mapId);
+        console.log(currentRoom);
+        console.log(map);
+        //console.log(map.name.toUpperCase().replace(/ /g, '_'));
+        (0, _groundManager.initGround)(map.ground);
+        (0, _wallsManager.initWalls)(map.walls);
+        const player = (0, _playerManager.initPlayer)((0, _api.playerId), {
+            ...map.start
+        });
+        (0, _screenManager.initScreen)(player);
+        (0, _enemiesManager.initEnemies)(currentRoom.players);
+        const { x, y } = map.start;
+        (0, _websocket.enterRoom)(currentRoom.roomId, {
+            x: (0, _units.CellsToMeter)(x),
+            y: (0, _units.CellsToMeter)(y)
+        });
+        loader.style.display = "none";
+    } catch (err) {
+        console.log(err);
+    }
 };
 startGame();
 
