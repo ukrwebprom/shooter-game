@@ -9,7 +9,7 @@ const getRoom = async (n) => {
         const response = await instance(`/rooms/${req}`);
         return response.data;
     } catch(err) {
-        return err;
+        throw new Error(err);
     }
 }
 const getMap = async(roomID) => {
@@ -17,7 +17,7 @@ const getMap = async(roomID) => {
         const response = await instance(`/map/?id=${roomID}`);
         return response.data;
     } catch(err) {
-        return err;
+        throw new Error(err);
     }
 }
 
